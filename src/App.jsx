@@ -27,7 +27,7 @@ class App extends React.Component {
   componentDidMount() {
       axios.get('/api/todos')
         .then(response => response.data)
-        .then(todos => setState({todos}))
+        .then(todos => this.setState({todos}))
         .catch(error => console.error(error));
   }
 
