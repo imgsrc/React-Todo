@@ -28,55 +28,60 @@ class App extends React.Component {
       axios.get('/api/todos')
         .then(response => response.data)
         .then(todos => this.setState({todos}))
-        .catch(error => console.error(error));
+        .catch(this.handleError);
   }
 
-    nextId() {
-        this._nextId = this._nextId || 4;
-        return this._nextId++;
-    }
-
     handleAdd(title) {
-        const todo = {
-            id: this.nextId(),
-            title,
-            completed: false
-        };
-
-        const todos = [...this.state.todos, todo];
-
-        this.setState({ todos });
+      axios.post('/api/todos', { title })
+        .then(response => response.data)
+        .then(todo => {
+          const todos = [ ...this.state.todos, todo ];
+          this.setState({ todos });
+        })
+        .catch(this.handleError);
     } 
 
     handleDelete(id) {
-        const todos = this.state.todos.filter(todo => todo.id !== id);
+      axios.delete(`/api/todos/${id}`)
+        .then(() => {
+          const todos = this.state.todos.filter(todo => todo.id !== id);
+          this.setState({ todos });
+        })
+        .catch(this.handleError);
 
-        this.setState({ todos });
     }
 
     handleToggle(id) {
-        const todos = this.state.todos.map(todo => {
+      axios.patch(`/api/todos/${id}`)
+        .then(response => {
+          const todos = this.state.todos.map(todo => {
             if (todo.id === id) {
-                todo.completed = !todo.completed;
+              todo = response.data;
             }
-
             return todo;
-        });
-
-        this.setState({ todos });
+          });
+          this.setState({ todos });
+        })
+        .catch(this.handleError);
     }
 
     handleEdit(id, title) {
-        const todos = this.state.todos.map(todo => {
+      axios.put(`/api/todos/${id}`, { title })
+        .then(response => {
+          const todos = this.state.todos.map(todo => {
             if (todo.id === id) {
-                todo.title = title;
+              todo = response.data;
             }
-
             return todo;
-        });
-
-        this.setState({ todos });
+          });
+          this.setState({ todos });
+        })
+        .catch(this.handleError);
     }
+
+  handleError( error ) {
+    console.error(error);
+  }
 
     render() {
         return (
